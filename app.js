@@ -1,142 +1,53 @@
-var serverURL = 'https://dreamcar-results-reader-axr6x.ondigitalocean.app';
-// var serverURL = 'http://example.com';
-var $spinner = $('#spinner');
-var $prompt = $('#prompt');
-var $success = $('#success');
-var $results = $('#results');
-var $serverError = $('#server-error');
-var $notFound = $('#not-found');
-var $accountName = $('.account-name');
-var $search = $('input[name=search]');
+const BACKEND_URL = 'http://honda_s2000.recar.io/';
 
-var retriesAvailableCount = 1;
+(function(){
+    if (typeof define === 'function' && define.amd)
+        define('autoComplete', function () { return autoComplete; });
+    else if (typeof module !== 'undefined' && module.exports)
+        module.exports = autoComplete;
+    else
+        window.autoComplete = autoComplete;
+})();
 
-$('#search').onclick = searchAccount;
-$('form').onsubmit = function (event) { event.preventDefault(); }
+//
+var xhr;
+var demo = new autoComplete({
+    selector: "input[name='search']",
+    cache: false,
+    minChars: 1,
+    source: function(term, response) {
+        try { xhr.abort(); } catch(e){}
+        xhr = $.getJSON(BACKEND_URL, { q: term }, function(data) {
+            $('.account-name').text('');
+            $('#success').html('');
 
-// Utils
-
-function $(selector) {
-  return document.querySelector(selector);
-}
-
-function getRandomArbitrary(min, max) {
-  return Math.random() * (max - min) + min;
-}
-
-function normalizeAccountName(n) {
-  return n.trim().replace(/https:\/\/www.instagram.com\//, '')
-                 .replace(/https:\/\/instagram.com\//, '')
-                 .replace(/\?.+$/, '')
-                 .replace(/\//,'');
-}
-
-function extractSearchValue() {
-  return normalizeAccountName($search.value);
-}
-
-// Utils
-
-// Events
-
-function onLoad(event) {
-  var searchValue = extractSearchValue();
-  var accountID;
-
-  try {
-    accountID = JSON.parse(event.target.response)[searchValue];
-  } catch (error) {
-    console.log(error);
-  }
-
-  if (accountID) {
-    $spinner.classList.add('d-none');
-    $spinner.classList.remove('d-flex');
-    $success.classList.remove('d-none');
-    $success.innerHTML = `<H2>ПОЗДРАВЛЯЕМ</H2><p>Ваш аккаунт <b>${searchValue}</b> принимает участие в розыгрыше</p><p>Ваш счастливый номер: <b>${accountID}</b></p><H3>Удачи!</H3>`;
-    $results.classList.add('success');
-  } else {
-    $spinner.classList.add('d-none');
-    $spinner.classList.remove('d-flex');
-    $success.classList.add('d-none');
-    $success.innerText = '';
-
-    $accountName.innerText = searchValue;
-
-    $notFound.classList.remove('d-none');
-    $results.classList.add('error');
-
-  }
-}
-
-function onError(event) {
-  if (retriesAvailableCount > 0) {
-    retriesAvailableCount--;
-    setTimeout(function() { searchAccount() }, getRandomArbitrary(300, 1000));
-  } else {
-    displayServerError();
-    retriesAvailableCount++;
-  }
-}
-
-// Events
-
-
-// DOM
-
-function displayServerError() {
-  $spinner.classList.remove('d-none');
-  $spinner.classList.remove('d-flex');
-  $spinner.classList.add('d-none');
-
-  $serverError.classList.remove('d-none');
-
-  $results.classList.remove('error');
-  $results.classList.remove('success');
-  $results.classList.remove('warning');
-  $results.classList.add('warning');
-}
-
-function resetState() {
-  $notFound.classList.remove('d-none');
-  $notFound.classList.add('d-none');
-
-  $success.classList.remove('d-none');
-  $success.classList.add('d-none');
-
-  $spinner.classList.remove('d-none');
-  $spinner.classList.remove('d-flex');
-  $spinner.classList.add('d-none');
-
-  $results.classList.remove('error');
-  $results.classList.remove('success');
-  $results.classList.remove('warning');
-
-  $serverError.classList.remove('d-none');
-  $serverError.classList.add('d-none');
-}
-
-function showSpinner() {
-  $prompt.classList.add('d-none');
-  $spinner.classList.remove('d-none');
-  $spinner.classList.add('d-flex');
-}
-
-// DOM
-
-function searchAccount() {
-  if (extractSearchValue() === '') { return }
-
-  resetState();
-  showSpinner();
-  var searchValue = extractSearchValue();
-
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', `${serverURL}/${searchValue}`, true);
-
-  xhr.onload = onLoad;
-
-  xhr.onerror = onError;
-
-  xhr.send(null);
-}
+            if (data.length === 0) {
+                $('#not-found').removeClass('d-none');
+                $('#success').addClass('d-none');
+                $('.account-name').text($('input[name=search]')[0].value);
+                response(data);
+            } else if (data.length === 1) {
+                $('#success').removeClass('d-none');
+                $('#success').html(`<H2>ПОЗДРАВЛЯЕМ</H2><p>Ваш аккаунт <b>${data[0].name}</b> принимает участие в розыгрыше</p><p>Ваш счастливый номер: <b>${data[0].id}</b></p><H3>Удачи!</H3>`);
+                $('#results').addClass('success');
+                $('#not-found').addClass('d-none');
+                $('#success')[0].scrollIntoView();
+                response([]);
+            } else {
+                $('#not-found').addClass('d-none');
+                $('#success').addClass('d-none');
+                response(data);
+            }
+        });
+    },
+    renderItem: function (item, search) {
+      var re = new RegExp("(" + search.split(' ').join('|') + ")", "gi");
+      return `<div class="autocomplete-suggestion" data-name="${item.name}" data-id="${item.id}">${item.name.replace(re, "<b>$1</b>")}</div>`;
+    },
+    onSelect: function(e, term, item) {
+      $('#success').removeClass('d-none');
+      $('#success').html(`<H2>ПОЗДРАВЛЯЕМ</H2><p>Ваш аккаунт <b>${$(item).data('name')}</b> принимает участие в розыгрыше</p><p>Ваш счастливый номер: <b>${$(item).data('id')}</b></p><H3>Удачи!</H3>`);
+      $('#results').addClass('success');
+      $('#not-found').addClass('d-none');
+    }
+});

@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Результаты розыгрыша Audi S8 от DreamCar.ua</title>
+  <title>Результаты розыгрыша Honda S2000 от DreamCar.ua</title>
   <meta name="description" content="Проверка своего аккаунта на участие в розыгрыше">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -23,51 +23,42 @@
   <link rel="stylesheet" href="/spinner.css">
   <link rel="stylesheet" href="/style.css">
 
-  <script src="/app.js" defer=""></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-  <meta name="theme-color" content="#fafafa">
-<meta class="CryptoPluginExtensionLoaded" content="1.0.2"></head>
+  <script src="auto_complete.js" defer=""></script>
+  <script src="app.js" defer=""></script>
 
   <body>
     <div class="wrap">
 
       <div id="main-content">
           <center><img src="https://dreamcar.ua/wp-content/uploads/2018/04/DreamCar.ua_universal.png" alt="dreamcar" height="80"></center>
-          <h1>Проверка аккаунта на участие в розыгрыше Audi S8 от <a href="https://dreamcar.ua">dreamcar.ua</a></h1>
+          <h1>Проверка аккаунта на участие в розыгрыше Honda&nbsp;S2000 от <a href="https://dreamcar.ua">dreamcar.ua</a></h1>
+          <label for='search'>Инстаграм аккаунт:<label>
           <form id="search-bar">
-              <input name="search" placeholder="Введите аккаунт..." required="">
-              <button id="search" type="submit">Проверить</button>
+              <input name="search" id='search' placeholder="Например, recar.io" required="">
           </form>
 
           <div id="results">
-            <p id="prompt">Введите свой логин в Инстаграм для поиска. Можно использовать как название аккаунта (например, recar.io), так и ссылку, например, — <a href="https://www.instagram.com/recar.io/">https://www.instagram.com/recar.io/</a></p>
-            <div id="spinner" class="d-none">
-              <div class="lds-ripple"><div></div><div></div></div>
-            </div>
-            <div id="not-found" class="d-none">
+            <p id="success" class="d-none"></p>
+            <div id="not-found" class="d-none error">
               <h2>Аккаунт не найден</h2>
               <p>Пожалуйста, проверьте правильность ввода логина: <span class="account-name"></span></p>
               <p>В обратном случае, обратитесь к организаторам</p>
-            </div>
-            <p id="success" class="d-none"></p>
-            <div id="server-error" class="d-none">
-              <h2>Произошла ошибка на сервере</h2>
-              <p>Возможно, слишком много людей одновременно хотят проверить свой аккаунт :(</p>
-              <p>Пожалуйста, попробуйте ещё раз через несколько минут</p>
-              <p>Приносим свои извинения</p>
             </div>
           </div>
 
           <div id="ads">
               <h1>Розыгрыш в прямом эфире в 19:00</h1>
               <h1>НЕ ПРОПУСТИ!</h1>
-            <a href="https://recar.io">Рекарио</a> © 2018 — 2020
+            <a href="https://recar.io">Рекарио</a> © 2018 — 2021
             <br>
             Любим автомобили и делаем то, что другие не могут
             <br>❤️
+            <br>
+            P.S. Выиграй три iPhone 11 установив <a href="https://recar.io/get">приложение Рекарио</a>, больше подробностей на <a href="https://www.instagram.com/recar.io/">здесь</a>.
           </div>
       </div>
-
   </div>
 </body>
 </html>
