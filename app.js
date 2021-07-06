@@ -1,4 +1,4 @@
-const BACKEND_URL = 'http://honda-s2000.recar.io/';
+const BACKEND_URL = 'https://honda-s2000.recar.io/';
 
 (function(){
     if (typeof define === 'function' && define.amd)
