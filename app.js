@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://honda-s2000.recar.io/';
+const CSV_URL = 'https://recario-space.ams3.digitaloceanspaces.com/Instagram.csv';
 
 (function(){
     if (typeof define === 'function' && define.amd)
@@ -9,15 +9,59 @@ const BACKEND_URL = 'https://honda-s2000.recar.io/';
         window.autoComplete = autoComplete;
 })();
 
-//
-var xhr;
-var demo = new autoComplete({
-    selector: "input[name='search']",
-    cache: false,
-    minChars: 1,
-    source: function(term, response) {
-        try { xhr.abort(); } catch(e){}
-        xhr = $.getJSON(BACKEND_URL, { q: term }, function(data) {
+if (localStorage.getItem('data') === null) {
+    reloadData();
+} else {
+    checkUpdates();
+}
+
+function checkUpdates() {
+    $.ajax({
+        type: 'HEAD',
+        async: true,
+        cache: false,
+        url: CSV_URL,
+    }).done(function(data, status, xhr) {
+        var newLastModified = xhr.getResponseHeader('last-modified');
+        var currentLastModified = localStorage.getItem('lastModified');
+
+        if (currentLastModified === newLastModified) {
+            console.log('Retrieving data from LocalStorage');
+            initialize(localStorage.getItem('data'));
+        } else {
+            reloadData();
+        }
+    });
+}
+
+function reloadData() {
+    console.log('Fetching data');
+    $.ajax({
+        url: CSV_URL,
+        cache: false,
+    }).done(function(data, status, xhr){
+        var lastModified = xhr.getResponseHeader('last-modified');
+        console.log('Started storing data');
+        localStorage.setItem('data', data);
+        localStorage.setItem('lastModified', lastModified);
+        console.log('Finished storing data');
+        initialize(data);
+     });
+}
+
+function initialize(accounts) {
+    console.log('Initialized');
+    accounts = accounts.split(/\r?\n/).map(line => {
+        let t = line.split(';');
+        return { id: t[0], name: t[1] }
+    });
+
+    new autoComplete({
+        selector: "input[name='search']",
+        cache: false,
+        minChars: 1,
+        source: function(term, response) {
+            data = accounts.filter(line => line.name.match(term)).slice(0,10)
             $('.account-name').text('');
             $('#success').html('');
 
@@ -38,16 +82,16 @@ var demo = new autoComplete({
                 $('#success').addClass('d-none');
                 response(data);
             }
-        });
-    },
-    renderItem: function (item, search) {
-      var re = new RegExp("(" + search.split(' ').join('|') + ")", "gi");
-      return `<div class="autocomplete-suggestion" data-name="${item.name}" data-id="${item.id}">${item.name.replace(re, "<b>$1</b>")}</div>`;
-    },
-    onSelect: function(e, term, item) {
-      $('#success').removeClass('d-none');
-      $('#success').html(`<H2>ПОЗДРАВЛЯЕМ</H2><p>Ваш аккаунт <b>${$(item).data('name')}</b> принимает участие в розыгрыше</p><p>Ваш счастливый номер: <b>${$(item).data('id')}</b></p><H3>Удачи!</H3>`);
-      $('#results').addClass('success');
-      $('#not-found').addClass('d-none');
-    }
-});
+        },
+        renderItem: function (item, search) {
+          var re = new RegExp("(" + search.split(' ').join('|') + ")", "gi");
+          return `<div class="autocomplete-suggestion" data-name="${item.name}" data-id="${item.id}">${item.name.replace(re, "<b>$1</b>")}</div>`;
+        },
+        onSelect: function(e, term, item) {
+          $('#success').removeClass('d-none');
+          $('#success').html(`<H2>ПОЗДРАВЛЯЕМ</H2><p>Ваш аккаунт <b>${$(item).data('name')}</b> принимает участие в розыгрыше</p><p>Ваш счастливый номер: <b>${$(item).data('id')}</b></p><H3>Удачи!</H3>`);
+          $('#results').addClass('success');
+          $('#not-found').addClass('d-none');
+        }
+    });
+}
