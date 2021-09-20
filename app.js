@@ -1,26 +1,5 @@
 const CSV_URL = 'https://recario-space.ams3.digitaloceanspaces.com/Instagram.csv';
 
-dbg('XXX')
-
-try{
-  if ('localStorage' in window && window.localStorage !== null) {
-    localStorage.setItem('testLocalStorage', 'testLocalStorage');
-    if (localStorage.getItem('testLocalStorage') !== 'testLocalStorage') {
-        localStorage.removeItem('testLocalStorage');
-        //for private browsing, error is thrown before even getting here
-        alert('can read CANNOT write'); 
-    }else{
-        localStorage.removeItem('testLocalStorage');
-        alert('can use');
-    }
-  }else{
-    alert('CANNOT use');
-  }
-}catch(ex){
-  alert('CANNOT use reliably');
-}
-
-
 (function(){
     if (typeof define === 'function' && define.amd)
         define('autoComplete', function () { return autoComplete; });
@@ -47,7 +26,7 @@ function checkUpdates() {
         var currentLastModified = localStorage.getItem('lastModified');
 
         if (currentLastModified === newLastModified) {
-            dbg('Retrieving data from LocalStorage');
+            console.log('Retrieving data from LocalStorage');
             initialize(localStorage.getItem('data'));
         } else {
             reloadData();
@@ -56,33 +35,33 @@ function checkUpdates() {
 }
 
 function reloadData() {
-    dbg('Fetching data');
+    console.log('Fetching data');
     $.ajax({
         url: CSV_URL,
         cache: false,
     }).done(function(data, status, xhr){
         var lastModified = xhr.getResponseHeader('last-modified');
-        dbg('Started storing data');
+        console.log('Started storing data');
         localStorage.setItem('data', data);
         localStorage.setItem('lastModified', lastModified);
-        dbg('Finished storing data');
+        console.log('Finished storing data');
         initialize(data);
      });
 }
 
 function initialize(accounts) {
-    dbg('Initialized');
+    console.log('Initialized');
     accounts = accounts.split(/\r?\n/).map(line => {
         let t = line.split(';');
         return { id: t[0], name: t[1] }
-    });
+    }).filter(line => !!(line.id && line.name));
 
     new autoComplete({
         selector: "input[name='search']",
         cache: false,
         minChars: 1,
         source: function(term, response) {
-            data = accounts.filter(line => line.name.match(term)).slice(0,10)
+            data = accounts.filter(line => line.name.toLowerCase().match(term.toLowerCase())).slice(0,10)
             $('.account-name').text('');
             $('#success').html('');
 
@@ -116,8 +95,3 @@ function initialize(accounts) {
         }
     });
 }
-
-function dbg(str) {
-    // console.log(arguments)
-    $('#ads').append("<br>", str, "<br>")
-} 
