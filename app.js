@@ -1,5 +1,26 @@
 const CSV_URL = 'https://recario-space.ams3.digitaloceanspaces.com/Instagram.csv';
 
+
+
+try{
+  if ('localStorage' in window && window.localStorage !== null) {
+    localStorage.setItem('testLocalStorage', 'testLocalStorage');
+    if (localStorage.getItem('testLocalStorage') !== 'testLocalStorage') {
+        localStorage.removeItem('testLocalStorage');
+        //for private browsing, error is thrown before even getting here
+        alert('can read CANNOT write'); 
+    }else{
+        localStorage.removeItem('testLocalStorage');
+        alert('can use');
+    }
+  }else{
+    alert('CANNOT use');
+  }
+}catch(ex){
+  alert('CANNOT use reliably');
+}
+
+
 (function(){
     if (typeof define === 'function' && define.amd)
         define('autoComplete', function () { return autoComplete; });
