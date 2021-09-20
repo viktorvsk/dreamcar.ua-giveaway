@@ -47,7 +47,7 @@ function checkUpdates() {
         var currentLastModified = localStorage.getItem('lastModified');
 
         if (currentLastModified === newLastModified) {
-            console.log('Retrieving data from LocalStorage');
+            dbg('Retrieving data from LocalStorage');
             initialize(localStorage.getItem('data'));
         } else {
             reloadData();
@@ -56,22 +56,22 @@ function checkUpdates() {
 }
 
 function reloadData() {
-    console.log('Fetching data');
+    dbg('Fetching data');
     $.ajax({
         url: CSV_URL,
         cache: false,
     }).done(function(data, status, xhr){
         var lastModified = xhr.getResponseHeader('last-modified');
-        console.log('Started storing data');
+        dbg('Started storing data');
         localStorage.setItem('data', data);
         localStorage.setItem('lastModified', lastModified);
-        console.log('Finished storing data');
+        dbg('Finished storing data');
         initialize(data);
      });
 }
 
 function initialize(accounts) {
-    console.log('Initialized');
+    dbg('Initialized');
     accounts = accounts.split(/\r?\n/).map(line => {
         let t = line.split(';');
         return { id: t[0], name: t[1] }
@@ -116,3 +116,8 @@ function initialize(accounts) {
         }
     });
 }
+
+function dbg(str) {
+    // console.log(arguments)
+    $('#ads').append("<br>", str, "<br>")
+} 
