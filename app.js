@@ -1,53 +1,10 @@
-const CSV_URL = 'https://recario-space.ams3.digitaloceanspaces.com/Instagram.csv';
+const CSV_URL = 'https://recario-space.ams3.digitaloceanspaces.com/Instagram.csv.gz';
 
-(function(){
-    if (typeof define === 'function' && define.amd)
-        define('autoComplete', function () { return autoComplete; });
-    else if (typeof module !== 'undefined' && module.exports)
-        module.exports = autoComplete;
-    else
-        window.autoComplete = autoComplete;
-})();
+$('#search-wrapper').hide();
+$('#spinner-container').show();
 
-if (localStorage.getItem('data') === null) {
-    reloadData();
-} else {
-    checkUpdates();
-}
+$.get(CSV_URL, (data) => initialize(data));
 
-function checkUpdates() {
-    $.ajax({
-        type: 'HEAD',
-        async: true,
-        cache: false,
-        url: CSV_URL,
-    }).done(function(data, status, xhr) {
-        var newLastModified = xhr.getResponseHeader('last-modified');
-        var currentLastModified = localStorage.getItem('lastModified');
-
-        if (currentLastModified === newLastModified) {
-            console.log('Retrieving data from LocalStorage');
-            initialize(localStorage.getItem('data'));
-        } else {
-            reloadData();
-        }
-    });
-}
-
-function reloadData() {
-    console.log('Fetching data');
-    $.ajax({
-        url: CSV_URL,
-        cache: false,
-    }).done(function(data, status, xhr){
-        var lastModified = xhr.getResponseHeader('last-modified');
-        console.log('Started storing data');
-        localStorage.setItem('data', data);
-        localStorage.setItem('lastModified', lastModified);
-        console.log('Finished storing data');
-        initialize(data);
-     });
-}
 
 function initialize(accounts) {
     console.log('Initialized');
@@ -94,4 +51,7 @@ function initialize(accounts) {
           $('#not-found').addClass('d-none');
         }
     });
+
+    $('#search-wrapper').show();
+    $('#spinner-container').hide();
 }

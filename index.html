@@ -34,10 +34,17 @@
       <div id="main-content">
           <center><img src="https://dreamcar.ua/wp-content/uploads/2018/04/DreamCar.ua_universal.png" alt="dreamcar" height="80"></center>
           <h1>Проверка аккаунта на участие в розыгрыше Audi&nbsp;Q7 от <a href="https://dreamcar.ua">dreamcar.ua</a></h1>
-          <label for='search'>Инстаграм аккаунт:<label>
-          <form id="search-bar">
-              <input name="search" id='search' placeholder="Например, recar.io" required="">
-          </form>
+          
+          <center id='spinner-container'>
+            <div class="lds-ripple"><div></div><div></div></div>
+            Загрузка...
+          </center>
+          <div id='search-wrapper'>
+            <label for='search'>Инстаграм аккаунт:</label>
+            <form id="search-bar">
+                <input name="search" id='search' placeholder="Например, recar.io" required="">
+            </form>
+          </div>
 
           <div id="results">
             <p id="success" class="d-none"></p>
